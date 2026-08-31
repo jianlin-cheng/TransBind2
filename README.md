@@ -97,5 +97,30 @@ Before training the model, complete the following steps:
 | 5 | Feature mapping | Ensure `tf_mapping_with_features_with_graphsV1.csv` exists in `data/Binary_dataV1/Binary_data_for_TF_splitV3/EGNN/` and maps each `tf_idx` to its corresponding protein feature file |
 | 6 | Protein features | Ensure `Protein_data/prostt5_featuresV1/` contains the `.fea` embedding files referenced by the TF mapping |
 
-### Training Dataset
+### Training 
+
+### Training
+
+Before training, ensure that all preprocessing steps have been completed and the required DNA, DNase, uniqueness, and protein feature files are available as described above.
+
+Update the repository root in the training script:
+
+```python
+HOME_DIR = "/path/to/HOME_DIR"
+```
+
+where `HOME_DIR` is the path to the cloned TransBind repository.
+
+Run the training script:
+
+```bash
+cd scripts
+python train.py
+```
+
+Model checkpoints are saved to:
+
+```text
+model_binary_best_sweep_v2/
+```
 
