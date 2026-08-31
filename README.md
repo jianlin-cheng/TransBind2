@@ -46,35 +46,37 @@ conda activate transBind
 
 # Data Preprocessing Pipeline
 
+# Data Preprocessing Pipeline
+
 | Step | Script | Description |
 |---|---|---|
-| 1 | `0_download_data.py` | Download human genome assembly and Transcription Factor Binding Sites |
-| 2 | `1_preprocess_narrowPeaks_and_humanGenome.sh` | Preprocess human genome assembly and TF binding sites |
-| 3 | `2_compute_overlapping_using_batch.sh`<br>`3_postprocess.sh`<br>`4_merge_peaks_with_same_labels.ipynb` | Find overlapping regions and assign labels |
-| 4 | `5_build_bedFile.py`<br>`5.1_convert_metadata.py` | Convert processed data to individual BED files |
-| 5 | `6_build_dataset.py`<br>`6.1_extract_labelname.py`<br>`6.2_creating_label_name_merged` | Build final dataset → saves to data/ directory and extract label names<br>Extract feature names from metadata → saves label_name.txt<br>Merge label_name.txt with TF/Cell Type mapping → saves label_file_final_merged.csv |
-| 6 | `7_data_conversion_to_binaryV1` | Convert .mat files to binary long-format dataset → saves {split}_unique_dna.npz, standalone_{split}_indices.npz |
-| 7 | `8_mapping_between_filename_TF.ipynb` | Create mapping between features and transcription factors |
-| 8 | `9_label_mapping_between_label_and_TF.py` | Create comprehensive mapping between labels and TFs |
+| 1 | `0_download_data.py` | Download the hg19 human genome assembly and ENCODE TF ChIP-seq peak files |
+| 2 | `1_preprocess_narrowPeaks_and_humanGenome.sh` | Sort TF peak files and divide the human genome into 200-bp bins |
+| 3 | `2_compute_overlapping_using_batch.sh`<br>`3_postprocess.sh`<br>`4_merge_peaks_with_same_labels.ipynb` | Compute overlaps between TF peaks and genome bins, merge results, and assign TF experiment labels to each genomic region |
+| 4 | `5_build_bedFile.py`<br>`5.1_convert_metadata.py` | Generate per-experiment BED files and convert UCSC metadata into the format required for dataset construction |
+| 5 | `6_build_dataset.py`<br>`6.1_extract_labelname.py`<br>`6.2_creating_label_name_merged.ipynb` | Build chromosome-based train/validation/test datasets (`.mat`), extract experiment names, and generate the final experiment-to-TF/cell-type mapping |
+| 6 | `7_data_conversion_to_binaryV1.py` | Convert the multi-label `.mat` datasets into binary long-format datasets containing `dna_idx`, `tf_idx`, `cell_idx`, and `labels` |
+| 7 | `8_mapping_between_filename_TF.ipynb` | Generate TF mappings and associate each TF with its corresponding protein feature information |
 
 ## Transcription Factor
 
 | Step | Script | Description |
 |---|---|---|
-| 1 | `1_download_fasta_from_uniprot.py` | Download amino-acid FASTA sequences from UniProt for each TF → saves to Protein_data/fasta/ |
-| 2 | `2_get_pdb_from_AF.py` | Download predicted protein structures (PDB) from AlphaFold for each FASTA → saves to Protein_data/AF_structure/ |
-| 3 | `3_PDB_to_3Di.sh` | Convert PDB structures to 3Di structural tokens using Foldseek → saves to Protein_data/3Di_tokens/ |
-| 4 | `4_generate_prostt5_embedding.py` | Generate ProstT5 dual-track (sequence + structure) embeddings per protein → saves to Protein_data/prostt5_featuresV1/ |
+| 1 | `1_download_fasta_from_uniprot.py` | Download amino-acid FASTA sequences from UniProt for each TF → saves to `Protein_data/fasta/` |
+| 2 | `2_get_pdb_from_AF.py` | Download predicted protein structures (PDB) from AlphaFold for each TF → saves to `Protein_data/AF_structure/` |
+| 3 | `3_PDB_to_3Di.sh` | Convert PDB structures to 3Di structural tokens using Foldseek → saves to `Protein_data/3Di_tokens/` |
+| 4 | `4_generate_prostt5_embedding.py` | Generate per-residue ProstT5 embeddings from amino-acid and 3Di sequences → saves to `Protein_data/prostt5_featuresV1/` |
+| 5 | `5_mapping_between_filename_protein.ipynb` | Map each TF index to its corresponding UniProt ID and ProstT5 feature file → saves the final TF–protein feature mapping |
 
 ## DNase Data
 
 | Step | Script | Description |
 |---|---|---|
-| 1 | `0_download_md5.sh` | Download DNase Uniform peaks from UCSC/ENCODE (wgEncodeAwgDnaseUniform), with md5 verification |
-| 2 | `1_convert_to_bw.sh` | Convert .narrowPeak.gz → .bedGraph → .bw per cell type via bedtools merge / bedClip / bedGraphToBigWig |
-| 3 | `2_extract_dnase_parallel.py` | Extract per-window DNase signal from .bw files at each {split}_coords.csv coordinate, in parallel across cell types |
-| 4 | `3_normalise_dnase.py` | Apply log1p + global z-score normalization + clipping ([-5, 5]) to all DNase signal files |
-| 5 | `4_convert_dnase_to_hdf5.py` | Consolidate per-cell-type normalized .npy files into {split}_dnase.h5, quantized to uint8; missing cell types auto-filled with a fixed no-coverage default |
+| 1 | `0_download_md5.sh` | Download ENCODE Uniform DNase-seq peak files (`wgEncodeAwgDnaseUniform`) from UCSC and verify file integrity using MD5 checksums |
+| 2 | `1_convert_to_bw.sh` | Convert `.narrowPeak.gz` files to bigWig (`.bw`) signal tracks using `bedtools merge`, `bedClip`, and `bedGraphToBigWig` |
+| 3 | `2_extract_dnase_parallel.py` | Extract 1000-bp DNase signal vectors from bigWig files at each `{split}_coords.csv` genomic window, in parallel across available cell types |
+| 4 | `3_normalise_dnase.py` | Apply `log1p`, global z-score normalization, and clipping to `[-5, 5]` to the extracted DNase signals |
+| 5 | `4_convert_dnase_to_hdf5.py` | Combine normalized per-cell `.npy` files into `{split}_dnase.h5`, quantize signals to `uint8`, and fill missing cell types with a fixed default value |
 
 ## Uniqueness Data
 
@@ -88,14 +90,12 @@ Before training the model, complete the following steps:
 
 | Step | Process | Description |
 |------|---------|-------------|
-| 1️ | Data preprocessing | Complete steps 1–8 from the preprocessing pipeline described above, plus the DNase, uniqueness, and protein feature pipelines |
-| 2 | Dataset organization | Ensure `train_unique_dna.npz`, `standalone_train_indices.npz` (and val/test equivalents) are stored in `data/Binary_dataV1/` |
-| 3 | DNase data | Ensure `train_dnase.h5` and `val_dnase.h5` exist in `data/Binary_dataV1/`  |
-| 4 | Uniqueness data | Ensure `train_uniqueness.npy` and `val_uniqueness.npy` exist in `uniqueness_processed/` |
-| 5 | Feature mapping | Verify `tf_mapping_with_features_with_graphsV1.csv` exists in `data/Binary_dataV1/Binary_data_for_TF_splitV3/EGNN/` (links TF labels to protein features) |
-| 6 | Protein features | Verify `Protein_data/prostt5_featuresV1/` contains the `.fea` embedding files referenced by the TF mapping |
-
----
+| 1 | Data preprocessing | Complete the main preprocessing pipeline, including DNA preprocessing, coordinate generation, DNase preprocessing, uniqueness preprocessing, and protein feature generation |
+| 2 | Dataset organization | Ensure `train_unique_dna.npz`, `standalone_train_indices.npz`, and the corresponding validation/test files are stored in `data/Binary_dataV1/` |
+| 3 | DNase data | Ensure `train_dnase.h5` and `val_dnase.h5` exist in `data/Binary_dataV1/` |
+| 4 | Uniqueness data | Ensure `train_uniqueness.npy` and `val_uniqueness.npy` exist in `data/uniqueness_processed/` |
+| 5 | Feature mapping | Ensure `tf_mapping_with_features_with_graphsV1.csv` exists in `data/Binary_dataV1/Binary_data_for_TF_splitV3/EGNN/` and maps each `tf_idx` to its corresponding protein feature file |
+| 6 | Protein features | Ensure `Protein_data/prostt5_featuresV1/` contains the `.fea` embedding files referenced by the TF mapping |
 
 ### Training Dataset
 
