@@ -190,7 +190,7 @@ cd scripts
 
 # Step 4: Run TF binding prediction
 
-python predict_new_tf.py \
+python predict.py \
   --dna "$DNA_SEQUENCE" \
   --protein_feature ../example/new_TF.fea \
   --uniqueness 0.82
@@ -199,7 +199,7 @@ python predict_new_tf.py \
 # DNase is optional. If available, provide the normalized
 # 1000-bp DNase signal:
 
-python predict_new_tf.py \
+python predict.py \
   --dna "$DNA_SEQUENCE" \
   --protein_feature ../example/new_TF.fea \
   --dnase ../example/dnase.npy \
