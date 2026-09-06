@@ -1,4 +1,4 @@
-# TransBind-2
+# TransBind2
 
 ## Table of Contents
 
@@ -23,17 +23,17 @@
 
 ## Overview
 
-TransBind-2 is a deep learning framework for predicting transcription factor (TF)–DNA binding by integrating DNA sequence with the biological context surrounding potential binding sites. Building on our previous TransBind model, TransBind-2 incorporates DNase-seq chromatin accessibility and genome mappability alongside DNA sequence information. To capture TF-specific features, the model uses ProstT5 to encode both the amino acid sequence and 3D structural information of each TF. These DNA and protein representations are connected through bidirectional cross-attention, allowing information from each modality to inform the other and providing a more complete representation of TF–DNA interactions.
+TransBind2 is a deep learning framework for predicting transcription factor (TF)–DNA binding by integrating DNA sequence with the biological context surrounding potential binding sites. Building on our previous TransBind model, TransBind2 incorporates DNase-seq chromatin accessibility and genome mappability alongside DNA sequence information. To capture TF-specific features, the model uses ProstT5 to encode both the amino acid sequence and 3D structural information of each TF. These DNA and protein representations are connected through bidirectional cross-attention, allowing information from each modality to inform the other and providing a more complete representation of TF–DNA interactions.
 
-TransBind-2 formulates binding prediction as a binary classification task for individual DNA bin–TF–cell type combinations. The model was trained on 690 ChIP-seq experiments covering 161 TFs and 91 human cell types. By incorporating protein representations directly into the prediction framework, TransBind-2 can also be applied to TFs not encountered during training when the corresponding protein features are provided. The model further demonstrated cross-species transferability through zero-shot evaluation on mouse datasets.
+TransBind2 formulates binding prediction as a binary classification task for individual DNA bin–TF–cell type combinations. The model was trained on 690 ChIP-seq experiments covering 161 TFs and 91 human cell types. By incorporating protein representations directly into the prediction framework, TransBind2 can also be applied to TFs not encountered during training when the corresponding protein features are provided. The model further demonstrated cross-species transferability through zero-shot evaluation on mouse datasets.
 
-Together, these results suggest that incorporating TF structural features and chromatin context can improve both the accuracy and generalizability of TF–DNA binding prediction. By capturing information from the TF, DNA sequence, and local chromatin environment within a unified framework, TransBind-2 provides an approach for investigating gene regulation and TF–DNA interactions.
+Together, these results suggest that incorporating TF structural features and chromatin context can improve both the accuracy and generalizability of TF–DNA binding prediction. By capturing information from the TF, DNA sequence, and local chromatin environment within a unified framework, TransBind2 provides an approach for investigating gene regulation and TF–DNA interactions.
 
 ## Model Architecture
 
 ![Model Architecture](final_module.png)
 
-*Figure 1: TransBind-2 model architecture for transcription factor binding site prediction.*
+*Figure 1: TransBind2 model architecture for transcription factor binding site prediction.*
 
 ## Installation
 
@@ -166,7 +166,7 @@ evaluation_results/
 
 # Prediction
 
-TransBind-2 can be used to predict TF–DNA binding for a new TF by providing its AA + 3Di ProstT5 protein representation.
+TransBind2 can be used to predict TF–DNA binding for a new TF by providing its AA + 3Di ProstT5 protein representation.
 
 ```bash
 # Step 1: Prepare a 1000-bp DNA sequence
@@ -218,7 +218,7 @@ If DNase data are not provided, the model uses the predefined no-coverage DNase 
 
 ## Citation
 
-If you use TransBind-2 in your research, please cite:
+If you use TransBind2 in your research, please cite:
 
 ```text
 
