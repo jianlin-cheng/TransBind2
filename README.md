@@ -86,10 +86,11 @@ conda activate transBind
 | Step | Script                        | Description                                                                                                                                           |
 | ---- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1    | `0_download_md5.sh`           | Download ENCODE Uniform DNase-seq peak files (`wgEncodeAwgDnaseUniform`) from UCSC and verify file integrity using MD5 checksums                      |
-| 2    | `1_convert_to_bw.sh`          | Convert `.narrowPeak.gz` files to bigWig (`.bw`) signal tracks using `bedtools merge`, `bedClip`, and `bedGraphToBigWig`                              |
-| 3    | `2_extract_dnase_parallel.py` | Extract 1000-bp DNase signal vectors from bigWig files at each `{split}_coords.csv` genomic window, in parallel across available cell types           |
-| 4    | `3_normalise_dnase.py`        | Apply `log1p`, global z-score normalization, and clipping to `[-5, 5]` to the extracted DNase signals                                                 |
-| 5    | `4_convert_dnase_to_hdf5.py`  | Combine normalized per-cell `.npy` files into `{split}_dnase.h5`, quantize signals to `uint8`, and fill missing cell types with a fixed default value |
+| 2    | `1_convert_to_bw.sh`          | Convert `.narrowPeak.gz` files to bigWig (`.bw`) signal tracks using `bedtools merge`, `bedClip`, and `bedGraphToBigWig`   
+| 3    | `1.1_extract_coordinates`          | Extract the coordinates from train,test and validation                            |
+| 4    | `2_extract_dnase_parallel.py` | Extract 1000-bp DNase signal vectors from bigWig files at each `{split}_coords.csv` genomic window, in parallel across available cell types           |
+| 5    | `3_normalise_dnase.py`        | Apply `log1p`, global z-score normalization, and clipping to `[-5, 5]` to the extracted DNase signals                                                 |
+| 6    | `4_convert_dnase_to_hdf5.py`  | Combine normalized per-cell `.npy` files into `{split}_dnase.h5`, quantize signals to `uint8`, and fill missing cell types with a fixed default value |
 
 ## Uniqueness Data
 
