@@ -10,7 +10,7 @@ from sklearn.metrics import (
 )
 from tqdm import tqdm
 
-from train_binaryV1_resume_dnase_uniqueness_attentionV1_subsampling_validation_V1 import BinaryProteinAwareTransBind, BinaryTransBindDataset
+from train import BinaryProteinAwareTransBind, BinaryTransBindDataset
 
 # ===========================================================
 # Paths
